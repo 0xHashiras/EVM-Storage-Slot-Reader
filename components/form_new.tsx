@@ -1,32 +1,38 @@
 
 import { useState,useEffect } from "react";
-import {QueryStruct} from "./interface"
+import {QueryStruct,Output} from "./interface"
 import {SlotReader} from "./../lib/slotReader"
-
+import { ethers } from "ethers";
 export const Form_new = () => {
-    let id = 0;
     let slotReader:SlotReader;
-    const[ContractAddress,setContractAddress] = useState("0x7b9A5ff0cb9B6eEe230510593176f925B0b85Ad0");
-    const[Provider,setProvider] = useState("https://polygon-mumbai.g.alchemy.com/v2/EziTiweQf9L1V2oeGQOcTPgeWk8j3qu-");
-    const [QueryList,setQueryList] = useState<QueryStruct[] >([]);
+    const[ContractAddress,SetContractAddress] = useState("");
+    const[Provider,SetProvider] = useState("");
+    const [QueryList,SetQueryList] = useState<QueryStruct[] >([]);
+    const [OutputList,SetOutputList] = useState<Output[]>([]);
+    const [VariableType,SetVariableType] = useState("uint");
+    const [SlotNumber,SetSlotNumber] = useState("0");
+    const [Id,setId]= useState(1);
 
+    
     function HandleContractAddress(inputAddress:string){
-        setContractAddress(inputAddress)
+        SetContractAddress(inputAddress)
         console.log(ContractAddress)
     }
+
 
     function HandleProvider(inputProvider:string){
-        setProvider(inputProvider)
+        SetProvider(inputProvider)
         console.log(Provider)
     }
-    function print() {
-        console.log(ContractAddress)
-        console.log(Provider)
-    }
-    useEffect(() => {
+    // function print() {
+    //     console.log("ContractAddress : ",ContractAddress)
+    //     console.log("Provider : ",Provider)
+    //     console.log("QueryList : ",QueryList)
+    // }
+     useEffect(() => {
         slotReader = new SlotReader(Provider,ContractAddress)
+        console.log(slotReader)
         // slotReader.test()
-
     }, 
     [ContractAddress,Provider]);
 
@@ -34,31 +40,37 @@ export const Form_new = () => {
         for (let Query of QueryList ) {
             console.log(Query.slotNumber,Query.variableType)
             let val = await slotReader.read(Query.slotNumber,Query.variableType)
-
+            SetOutputList((prevList) =>
+            [...prevList,{id:Query.id,value:val}]
+            )
             console.log("val",val)
        }
-        slotReader.read
         console.log(QueryList)
     }
+    function HandleClear() {
+        SetQueryList([]);
+    }
 
+    function HandleAdd() {
+        console.log("1")
+        let temp = Id +1;
+        setId(temp);
 
+        SetQueryList ((prevList) =>
+        [...prevList,{slotNumber:SlotNumber,variableType:VariableType,id:Id}]
+        )
 
-    useEffect(() => {
-        const form: any = document.querySelector('#QueringFrom');
-        form.onsubmit = () => {
-        const formData = new FormData(form);
-    
-        const variableType = formData.get('vars') as string;
-        const SlotNumber = formData.get('SlotNumber') as string;
-        ++id;
-        setQueryList ((prevList) =>   {
-        prevList.push({variableType:variableType ,slotNumber:SlotNumber,id:id});
-        console.log(QueryList);
-        return prevList
-        })
-        return false; // prevent reload
+    }
+
+    function  HandleVariableChange (Variable:string) {
+        SetVariableType(Variable);
     };
-}, [QueryList])
+
+    function  HandleSlotChange (Slot:string) {
+        SetSlotNumber(Slot);
+    };
+
+
 
 
     return (
@@ -74,28 +86,30 @@ export const Form_new = () => {
                 <input type="text"  placeholder="RPC Provider" value={Provider} onChange={e => 
                   HandleProvider(e.target.value)} />
             </div>
-            <form id='QueringFrom'>
+            <div>
                 <fieldset>
-                    <label htmlFor="Variable">Variable Type:</label>
-                    <select  name="vars">
-                        <option value= "uint256">uint256</option>
+                    <label htmlFor="Variable"  >Variable Type:</label>
+                    <select  name="vars" value={VariableType} onChange={e => 
+                  HandleVariableChange(e.target.value)} >
+                        <option value= "uint">uint256</option>
                         <option value= "string">string</option>
                         <option value= "bytes">bytes</option>
-                        <option value= "uin256[]">uin256[]</option>
+                        <option value= "int">int</option>
+                        <option value= "bool">bool</option>
+                        <option value= "address">address</option>
                     </select>
                     <label htmlFor="Slot number">Slot number:</label>
-                    <input name= "SlotNumber" type="string"  />
+                    <input name= "SlotNumber" type="string" value={SlotNumber} onChange={e => 
+                  HandleSlotChange(e.target.value)} />
                     </fieldset>
-                    <button > add </button>
-                    <input type="submit"/>
-        </form>
+            </div>
+                    <button onClick={HandleAdd}> add </button>
+                    <button onClick={HandleClear}> clear</button>
         <div>
           Querys to fetch :          
           {QueryList.map((Query,index)=>(
-            <div key={index} >
-              <> 
+            <div key={index}>
              Storage Slot Number {Query.slotNumber? Query.slotNumber :0} ----- Varibale Type {Query.variableType? Query.variableType : "null"}  
-              </>
             </div>
           ))}
         </div>
@@ -105,17 +119,16 @@ export const Form_new = () => {
                 Fetch
             </button>
         </div>
-            {/* <div>
-                <label htmlFor="Provider">Provider:</label>
-                <select  name="Provider" onChange={(e) => {HandleProvider(e.target.value);}} >
-                    <option value= "a">ETH MAINNET</option>
-                    <option value= "b">b</option>
-                    <option value= "c">c</option>
-                    <option value= "d">d</option>
-                </select>
-            </div> */}
+        <div>
+          Response:          
+          {OutputList.map((output,index)=>(
+            <div key={index}>
+             ID : {output.id? output.id:"null"} ----- Value {output.value? output.value : "null"}  
+            </div>
+          ))}
+        </div>
 
-            <button onClick={print} >print</button>
+            {/* <button onClick={print} >print</button> */}
         </div>
     )
 
