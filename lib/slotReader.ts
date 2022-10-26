@@ -57,7 +57,7 @@ export class SlotReader {
         if (type == "string") { return await this.readString(slotNumber,blockTag); }
         let data = await this.readSlot(slotNumber,blockTag)
         console.log("readVariable ...2",data)
-        return ethers.utils.defaultAbiCoder.decode([type], data)[0]
+        return parseInt(ethers.utils.defaultAbiCoder.decode([type], data)[0],16)
     }
     
     async read(slotNumber:string, type:string = "uint" , blockTag = "latest") {
