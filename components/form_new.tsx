@@ -34,7 +34,7 @@ export const Form_new = () => {
         console.log(slotReader)
         // slotReader.test()
     }, 
-    [ContractAddress,Provider]);
+    [ContractAddress,Provider,[]]);
 
     async function HandleFetch(){
         for (let Query of QueryList ) {
