@@ -15,7 +15,7 @@ export const Form_new = () => {
     const [Bool,setBool] = useState(false);
     const [ArrayLength,setArrayLength] = useState("[]");
 
-
+    // const check = [123456,789012]
     
     function HandleContractAddress(inputAddress:string){
         SetContractAddress(inputAddress)
@@ -89,7 +89,9 @@ export const Form_new = () => {
         setBool(false)
 
     }
-
+    function HandleClearOutput () {
+        SetOutputList([])
+    }
     function  HandleVariableChange (Variable:string) {
         SetVariableType(Variable);
     };
@@ -167,15 +169,24 @@ export const Form_new = () => {
             <button onClick={HandleFetch} >
                 Fetch
             </button>
+            <button onClick={HandleClearOutput}>
+                Clear Output
+            </button>
         </div>
         <div>
           Response:          
           {OutputList.map((output,index)=>(
             <div key={index}>
+                {console.log("output value ====",output.value)}
              ID : {output.id? output.id:"null"} ----- Value {output.value? output.value : "null"}  
             </div>
           ))}
         </div>
+        {/* <div>
+            {
+                check.join(' , ')
+            }
+        </div> */}
         </div>
     )
 
