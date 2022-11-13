@@ -12,13 +12,31 @@ export const Form_new = () => {
     const [VariableType,SetVariableType] = useState("uint");
     const [SlotNumber,SetSlotNumber] = useState("0");
     const [Id,setId]= useState(1);
+    const [Bool,setBool] = useState(false);
+    const [ArrayLength,setArrayLength] = useState("[]");
 
+    // const check = [123456,789012]
     
     function HandleContractAddress(inputAddress:string){
         SetContractAddress(inputAddress)
         console.log(ContractAddress)
     }
 
+    function HandleArrayLength(inputLength:string){
+        if (inputLength == "") {
+            setArrayLength("[]")
+        }
+        setArrayLength(inputLength)
+    }
+
+    function HandleBool(){
+        if(Bool == false ){
+            setBool(true)    
+        } 
+        else {
+            setBool(false)
+        }
+    }
 
     function HandleProvider(inputProvider:string){
         SetProvider(inputProvider)
@@ -39,7 +57,14 @@ export const Form_new = () => {
     async function HandleFetch(){
         for (let Query of QueryList ) {
             console.log(Query.slotNumber,Query.variableType)
-            let val = await slotReader.read(Query.slotNumber,Query.variableType)
+            let query_var
+            if (Query.isArray) {
+                query_var = Query.variableType + Query.arraylength
+            }
+            else {
+                query_var = Query.variableType
+            }
+            let val = await slotReader.read(Query.slotNumber,query_var)
             SetOutputList((prevList) =>
             [...prevList,{id:Query.id,value:val}]
             )
@@ -55,13 +80,18 @@ export const Form_new = () => {
         console.log("1")
         let temp = Id +1;
         setId(temp);
-
         SetQueryList ((prevList) =>
-        [...prevList,{slotNumber:SlotNumber,variableType:VariableType,id:Id}]
+        [...prevList,{slotNumber:SlotNumber,variableType:VariableType,id:Id,isArray:Bool,arraylength:ArrayLength}]
         )
+        SetVariableType("uint")
+        SetSlotNumber("0");
+        setArrayLength("[]")
+        setBool(false)
 
     }
-
+    function HandleClearOutput () {
+        SetOutputList([])
+    }
     function  HandleVariableChange (Variable:string) {
         SetVariableType(Variable);
     };
@@ -70,7 +100,13 @@ export const Form_new = () => {
         SetSlotNumber(Slot);
     };
 
+    const display = () => {
+        // const[value]
+        return  
+        {
 
+        }
+    }
 
 
     return (
@@ -101,6 +137,21 @@ export const Form_new = () => {
                     <label htmlFor="Slot number">Slot number:</label>
                     <input name= "SlotNumber" type="string" value={SlotNumber} onChange={e => 
                   HandleSlotChange(e.target.value)} />
+
+                    <label>Array ?</label>
+                    <input type="checkbox"  onChange={e => 
+                  HandleBool()}/>
+                    {Bool? (
+                        <div>
+                            <label>ArrayLength</label>
+                            <input name= "ArrayLength" type="string" placeholder="Default-Dynamic" value={ArrayLength} onChange={e => 
+                  HandleArrayLength(e.target.value)} />
+                        </div>
+                    ):(
+                        <div>
+
+                        </div>
+                    )}
                     </fieldset>
             </div>
                     <button onClick={HandleAdd}> add </button>
@@ -109,7 +160,7 @@ export const Form_new = () => {
           Querys to fetch :          
           {QueryList.map((Query,index)=>(
             <div key={index}>
-             Storage Slot Number {Query.slotNumber? Query.slotNumber :0} ----- Varibale Type {Query.variableType? Query.variableType : "null"}  
+             Storage Slot Number = {Query.slotNumber? Query.slotNumber :0} ----- Varibale Type = {Query.variableType? Query.variableType : "null"} ------- Is Array = {Query.isArray? "True" : "False"} ----- Arraylength = {Query.arraylength? Query.arraylength : "[]"}
             </div>
           ))}
         </div>
@@ -118,17 +169,24 @@ export const Form_new = () => {
             <button onClick={HandleFetch} >
                 Fetch
             </button>
+            <button onClick={HandleClearOutput}>
+                Clear Output
+            </button>
         </div>
         <div>
           Response:          
           {OutputList.map((output,index)=>(
             <div key={index}>
+                {console.log("output value ====",output.value)}
              ID : {output.id? output.id:"null"} ----- Value {output.value? output.value : "null"}  
             </div>
           ))}
         </div>
-
-            {/* <button onClick={print} >print</button> */}
+        {/* <div>
+            {
+                check.join(' , ')
+            }
+        </div> */}
         </div>
     )
 
