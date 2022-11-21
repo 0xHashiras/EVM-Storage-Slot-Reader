@@ -19,7 +19,7 @@ export const Form_new = () => {
     
     function HandleContractAddress(inputAddress:string){
         SetContractAddress(inputAddress)
-        console.log(ContractAddress)
+        // console.log(ContractAddress)
     }
 
     function HandleArrayLength(inputLength:string){
@@ -40,23 +40,19 @@ export const Form_new = () => {
 
     function HandleProvider(inputProvider:string){
         SetProvider(inputProvider)
-        console.log(Provider)
+        // console.log(Provider)
     }
-    // function print() {
-    //     console.log("ContractAddress : ",ContractAddress)
-    //     console.log("Provider : ",Provider)
-    //     console.log("QueryList : ",QueryList)
-    // }
+
      useEffect(() => {
         slotReader = new SlotReader(Provider,ContractAddress)
-        console.log(slotReader)
+        // console.log(slotReader)
         // slotReader.test()
     }, 
     [ContractAddress,Provider,[]]);
 
     async function HandleFetch(){
         for (let Query of QueryList ) {
-            console.log(Query.slotNumber,Query.variableType)
+            // console.log(Query.slotNumber,Query.variableType)
             let query_var
             if (Query.isArray) {
                 query_var = Query.variableType + Query.arraylength
@@ -68,9 +64,9 @@ export const Form_new = () => {
             SetOutputList((prevList) =>
             [...prevList,{id:Query.id,value:val}]
             )
-            console.log("val",val)
+            // console.log("val",val)
        }
-        console.log(QueryList)
+        // console.log(QueryList)
     }
     function HandleClear() {
         SetQueryList([]);
@@ -86,7 +82,7 @@ export const Form_new = () => {
         SetVariableType("uint")
         SetSlotNumber("0");
         setArrayLength("[]")
-        setBool(false)
+        // setBool(false)
 
     }
     function HandleClearOutput () {
@@ -141,7 +137,7 @@ export const Form_new = () => {
                     <label>Array ?</label>
                     <input type="checkbox"  onChange={e => 
                   HandleBool()}/>
-                    {Bool? (
+                    {Bool ? (
                         <div>
                             <label>ArrayLength</label>
                             <input name= "ArrayLength" type="string" placeholder="Default-Dynamic" value={ArrayLength} onChange={e => 
@@ -164,6 +160,9 @@ export const Form_new = () => {
             </div>
           ))}
         </div>
+        {/* <>
+            Boolean value {Bool ? "True" : " False"}
+        </> */}
 
         <div>
             <button onClick={HandleFetch} >
@@ -177,11 +176,12 @@ export const Form_new = () => {
           Response:          
           {OutputList.map((output,index)=>(
             <div key={index}>
-                {console.log("output value ====",output.value)}
+                {/* {console.log("output value ====",output.value)} */}
              ID : {output.id? output.id:"null"} ----- Value {output.value? output.value : "null"}  
             </div>
           ))}
         </div>
+        
         {/* <div>
             {
                 check.join(' , ')
